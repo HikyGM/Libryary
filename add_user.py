@@ -9,6 +9,7 @@ class Add_user(QMainWindow):
         self.connection = sqlite3.connect("db/library.db")
         uic.loadUi('forms/add_user_form.ui', self)  # Загружаем дизайн
         self.btn_add.clicked.connect(self.check_lines)
+        self.btn_cancel.clicked.connect(self.close)
         self.ex = ex
 
     def check_lines(self):

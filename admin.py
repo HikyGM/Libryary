@@ -4,9 +4,6 @@ from add_user import Add_user
 from add_group import Add_group
 from edit_user import Edit_user
 from edit_group import Edit_group
-# from new_auth import New_auth
-# from client_add import Clients
-# from give_book import Give_book
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
 
@@ -25,6 +22,7 @@ class Admin(QMainWindow):
 
         self.users_view()
         self.groups_view()
+        self.journal()
         # self.journal()
 
         # self.btn_add_user.clicked.connect(self.add_book)
@@ -33,6 +31,9 @@ class Admin(QMainWindow):
 
         self.btn_add_group.clicked.connect(self.add_groups)
         self.btn_edit_group.clicked.connect(self.edit_group)
+
+        self.btn_search_user.clicked.connect(self.search)
+
         # self.btn_add_reader.clicked.connect(self.add_reader)
         # self.btn_add_journal.clicked.connect(self.add_journal)
 
@@ -44,14 +45,17 @@ class Admin(QMainWindow):
         # self.btn_search.clicked.connect(self.search)
 
     def search(self):
-        if self.type_table == 0:
-            self.users_view(self.input_search.text())
-        elif self.type_table == 1:
-            self.journal(self.input_search.text())
-        elif self.type_table == 2:
-            self.author_view(self.input_search.text())
-        elif self.type_table == 3:
-            self.groups_view(self.input_search.text())
+        self.users_view(self.input_search_user.text())
+
+    def check(self, table):
+        # Получение номера строки
+        rows = list(set([i.row() for i in table.selectedItems()]))
+        if rows:
+            # Получение ID в строке (0-ой столбец)
+            ids = table.item(rows[0], 0).text()
+            return ids
+        else:
+            return False
 
     def tab_clear(self, table):
         # Удаление содержимого таблицы
@@ -111,82 +115,52 @@ class Admin(QMainWindow):
                     self.tw_users.setItem(i, j, QTableWidgetItem(str(val)))
 
     def journal(self, search=''):
-        self.type_table = 1
-        # self.tab_clear()
+        self.tab_clear(self.tw_auth_journal)
         if not search:
             search = ''
         cursor = self.connection.cursor()
-        # ticket = f"SELECT cb.id_clients_books, cb.id_client, cb.id_book, cb.date, cb.count_book, cb.id_book " + \
-        #      f"FROM clients_books cb, clients c " + \
-        #      f"WHERE cb.id_client = c.id_client AND c.name_client " + \
-        #      f"LIKE '%{search}%'"
-        ticket = f"SELECT rt.id_reader_ticket, rt.id_reader, rt.id_book, rt.id_user, rt.date_give, rt.date_return, rt.return_check " + \
-                 f"FROM readers_ticket rt, readers r " + \
-                 f"WHERE rt.id_reader = r.id_reader AND r.name_reader " + \
-                 f"LIKE '%{search}%'"
-        journal = cursor.execute(ticket).fetchall()
-        self.tw_journal.setColumnCount(7)
-        self.tw_journal.setColumnHidden(0, True)
-        # self.tw_journal.setColumnHidden(5, True)
-        self.tw_journal.setHorizontalHeaderLabels(
-            ['ID', 'Читатель', 'Книга', 'Выдал', 'Дата выдачи', 'Дата возврата', 'Возвращена'])
-        self.tw_journal.setRowCount(len(journal))
-        self.tw_journal.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.tw_journal.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        row_num = self.tw_journal.currentRow()
-        self.tw_journal.selectRow(row_num)
-        self.tw_journal.verticalHeader().setVisible(False)
-        self.tw_journal.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.tw_journal.verticalHeader().setDefaultSectionSize(50)
-        for i, elem in enumerate(journal):
+        users = cursor.execute(
+            f"SELECT id_journal, id_user, data_time "
+            f"FROM journal ").fetchall()
+        self.tw_auth_journal.setColumnCount(3)
+        # скрытие столбца с ID книг
+        # self.tw_users.setColumnHidden(0, True)
+        self.tw_auth_journal.setHorizontalHeaderLabels(
+            ['ID', 'Имя пользователя', 'Дата авторизации'])
+        self.tw_auth_journal.setRowCount(len(users))
+        # запрет на редактирование содержимого таблицы
+        self.tw_auth_journal.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
+        # выделение всей строки при нажатии на айтем
+        self.tw_auth_journal.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        row_num = self.tw_auth_journal.currentRow()
+        self.tw_auth_journal.selectRow(row_num)
+        # убираем не нужные номера строк
+        self.tw_auth_journal.verticalHeader().setVisible(False)
+        # установка адаптивно заполняющего размера ячеек
+        self.tw_auth_journal.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        # установка размера ячеек по вертикали
+        self.tw_auth_journal.verticalHeader().setDefaultSectionSize(50)
+        # self.tw_users.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
+        # установка размера ячеек по горизонтали
+        self.tw_auth_journal.horizontalHeader().setDefaultSectionSize(150)
+        # фиксированный размер 3 столбца
+        self.tw_auth_journal.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
+
+        self.tw_auth_journal.horizontalHeader().setDefaultSectionSize(20)
+        # фиксированный размер 3 столбца
+        # self.tw_users.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)
+        # self.tw_users.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)
+
+        for i, elem in enumerate(users):
             for j, val in enumerate(elem):
                 if j == 1:
-                    self.id_users.append(val)
-                    reader = cursor.execute("""
-                                SELECT name_reader
-                                FROM readers
-                                WHERE id_reader = ?""", (val,)).fetchall()
-                    self.tw_journal.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in reader])))
-                elif j == 2:
-                    book = cursor.execute("""
-                                SELECT name_book
-                                FROM books_in_library
-                                WHERE id_book = ?""", (val,)).fetchall()
-                    self.tw_journal.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in book])))
-                elif j == 3:
-                    user = cursor.execute("""
-                                SELECT name_user
-                                FROM users
-                                WHERE id_user = ?""", (val,)).fetchall()
-                    self.tw_journal.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in user])))
+                    type_user = cursor.execute("""
+                           SELECT name_user
+                           FROM users
+                           WHERE id_user = ?""", (val,)).fetchall()
+                    self.tw_auth_journal.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in type_user])))
                 else:
-                    self.tw_journal.setItem(i, j, QTableWidgetItem(str(val)))
-
-    def author_view(self, search=''):
-        self.type_table = 2
-        # self.tab_clear()
-        if not search:
-            search = ''
-        cursor = self.connection.cursor()
-        auth = cursor.execute(f"SELECT id_author, name_author "
-                              f"FROM authors "
-                              f"WHERE name_author "
-                              f"LIKE '%{search}%'").fetchall()
-        self.tw_users.setColumnCount(2)
-        self.tw_users.setColumnHidden(0, True)
-        self.tw_users.setHorizontalHeaderLabels(
-            ['ID', 'Авторы'])
-        self.tw_users.setRowCount(len(auth))
-        self.tw_users.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.tw_users.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        row_num = self.tw_users.currentRow()
-        self.tw_users.selectRow(row_num)
-        self.tw_users.verticalHeader().setVisible(False)
-        self.tw_users.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.tw_users.verticalHeader().setDefaultSectionSize(70)
-        for i, elem in enumerate(auth):
-            for j, val in enumerate(elem):
-                self.tw_users.setItem(i, j, QTableWidgetItem(str(val)))
+                    self.tw_auth_journal.setItem(i, j, QTableWidgetItem(str(val)))
 
     def groups_view(self, search=''):
         self.tab_clear(self.tw_groups)
@@ -218,21 +192,6 @@ class Admin(QMainWindow):
             for j, val in enumerate(elem):
                 self.tw_groups.setItem(i, j, QTableWidgetItem(str(val)))
 
-    def add(self):
-        if self.type_table == 0:
-            self.add_book = Add_book(0, self, 0)
-            self.add_book.show()
-            self.users_view()
-        elif self.type_table == 1:
-            self.add_give = Give_book(0, self)
-            self.add_give.show()
-        elif self.type_table == 2:
-            self.add_auth = New_auth(self, 0, 0, 1)
-            self.add_auth.show()
-        elif self.type_table == 3:
-            self.add_client = Clients(self, 0, 0, 1)
-            self.add_client.show()
-
     def add_users(self):
         self.user_add.show()
 
@@ -251,28 +210,6 @@ class Admin(QMainWindow):
 
     def add_journal(self):
         pass
-
-    def edit(self):
-        if self.type_table == 0:
-            id_book = self.check()
-            if id_book:
-                self.edit_book = Add_book(1, self, str(id_book))
-                self.edit_book.show()
-        elif self.type_table == 1:
-            id_journal = self.check()
-            if id_journal:
-                self.add_give = Give_book(1, self, id_journal)
-                self.add_give.show()
-        elif self.type_table == 2:
-            id_auth = self.check()
-            if id_auth:
-                self.add_auth = New_auth(self, self.check(), 1)
-                self.add_auth.show()
-        elif self.type_table == 3:
-            id_client = self.check()
-            if id_client:
-                self.edit_client = Clients(self, self.check(), 1)
-                self.edit_client.show()
 
     def delete(self):
         if self.type_table == 0:
@@ -352,16 +289,6 @@ class Admin(QMainWindow):
                     self.groups_view()
                 elif choice == QMessageBox.No:
                     pass
-
-    def check(self, table):
-        # Получение номера строки
-        rows = list(set([i.row() for i in table.selectedItems()]))
-        if rows:
-            # Получение ID в строке (0-ой столбец)
-            ids = table.item(rows[0], 0).text()
-            return ids
-        else:
-            return False
 
 
 def except_hook(cls, exception, traceback):

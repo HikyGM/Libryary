@@ -1,5 +1,6 @@
 import sys
 import sqlite3
+from datetime import datetime
 from manager import Manager
 from admin import Admin
 from librarian import Librarian
@@ -20,9 +21,15 @@ class Login(QMainWindow):
     def chek_user(self):
         cursor = self.connection.cursor()
         if self.login_input.text():
-            check = cursor.execute("""SELECT password_user, type_user FROM users WHERE login_user = ?""",
+            check = cursor.execute("""SELECT password_user, type_user, id_user FROM users WHERE login_user = ?""",
                                    (self.login_input.text(),)).fetchone()
             if check[0] == self.password_input.text():
+                cursor = self.connection.cursor()
+                now = datetime.now()
+                add = f'INSERT INTO journal(id_user, data_time)' + \
+                      f'VALUES ("{check[2]}", "{"{}.{}.{}  {}:{}".format(now.day, now.month, now.year, now.hour, now.minute)}")'
+                cursor.execute(add)
+                self.connection.commit()
                 ex.hide()
                 if check[1] == 1:
                     self.admin.show()
