@@ -57,6 +57,7 @@ class Edit_book(QMainWindow):
             for j in nb:
                 self.list_authors.append((i[0], j))
         self.view_author()
+        self.cr = [self.table_authors.item(i, 0).text() for i in range(self.table_authors.rowCount())]
         # добавление жанров
         cursor = self.connection.cursor()
         id_genre = list(
@@ -69,6 +70,7 @@ class Edit_book(QMainWindow):
             for j in gb:
                 self.list_genre.append((i[0], j))
         self.view_genre()
+        self.gr = [self.table_genre.item(i, 0).text() for i in range(self.table_genre.rowCount())]
 
         # события кнопок
         self.btn_add.clicked.connect(self.check_lines)
@@ -150,7 +152,7 @@ class Edit_book(QMainWindow):
         elif not self.table_genre.rowCount():
             self.label_info.setText('Добавьте автора книги')
         else:
-            self.add()
+            self.update()
 
     def add_authors(self):
         self.authors_view.show()
@@ -160,6 +162,57 @@ class Edit_book(QMainWindow):
 
     def add_public_house(self):
         self.public_house_view.show()
+
+    def update(self):
+        cursor = self.connection.cursor()
+        res = f'UPDATE books_in_library ' + \
+              f'SET name_book = "{self.line_name.text()}", year_book = "{self.line_year.text()}", ' + \
+              f'id_pub_house= "{self.name_public_house[0]}", location_book = "{self.line_way.text()}", ' + \
+              f'inventory_number = "{self.line_inv_numb.text()}", comm_book = "{self.text_comm.toPlainText()}" ' + \
+              f'WHERE id_book = {self.id_book}'
+        cursor.execute(res)
+        self.connection.commit()
+
+        # обновление авторов
+        for i in range(len(self.cr)):
+            cursor = self.connection.cursor()
+            tabres = f'DELETE FROM author_book WHERE id_book = {self.id_book} AND id_author = {self.cr[i]}'
+            cursor.execute(tabres)
+            self.connection.commit()
+        cursor = self.connection.cursor()
+        ida = list(set([self.table_authors.item(i, 0).text() for i in range(self.table_authors.rowCount())]))
+        for num in range(len(ida)):
+            cursor.execute(f'INSERT INTO author_book(id_book, id_author) VALUES ({self.id_book}, {ida[num]})')
+            self.connection.commit()
+
+        # обновление жанров
+        for i in range(len(self.gr)):
+            cursor = self.connection.cursor()
+            tabgen = f'DELETE FROM genre_book WHERE id_book = {self.id_book} AND id_genre = {self.gr[i]}'
+            cursor.execute(tabgen)
+            self.connection.commit()
+        cursor = self.connection.cursor()
+        idge = list(set([self.table_genre.item(i, 0).text() for i in range(self.table_genre.rowCount())]))
+        for num in range(len(idge)):
+            cursor.execute(f'INSERT INTO genre_book(id_book, id_genre) VALUES ({self.id_book}, {idge[num]})')
+            self.connection.commit()
+
+        # очистка всех полей после добавления
+        self.list_authors = []
+        self.list_genre = []
+        self.name_public_house = ''
+        self.tab_clear(self.table_authors)
+        self.tab_clear(self.table_genre)
+        self.line_pub_houses.setText(str(self.name_public_house))
+        self.ex.books_view()
+        self.line_name.clear()
+        self.line_year.clear()
+        self.line_inv_numb.clear()
+        self.line_way.clear()
+        self.line_pub_houses.clear()
+        self.text_comm.clear()
+        # закрытие формы
+        self.close()
 
     def add(self):
         # добавление в базу книги
