@@ -24,7 +24,7 @@ class Add_new_author(QMainWindow):
               f'VALUES ("{self.line_name.text()}")'
         cursor.execute(add)
         self.connection.commit()
-        self.ex.public_house_view()
+        self.ex.author_view()
         self.close()
 
     def add_author(self):
