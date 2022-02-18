@@ -30,6 +30,8 @@ class Manager(QMainWindow):
 
         self.btn_edit_book.clicked.connect(self.edit_book)
 
+        self.btn_del_book.clicked.connect(self.delete_book)
+
         # self.btn_del.clicked.connect(self.delete)
 
         # self.tw_books.itemChanged.connect(self.edit)
@@ -231,21 +233,6 @@ class Manager(QMainWindow):
                 else:
                     self.tw_readers.setItem(i, j, QTableWidgetItem(str(val)))
 
-    # def add(self):
-    #     if self.type_table == 0:
-    #         self.add_book = Add_book(0, self, 0)
-    #         self.add_book.show()
-    #         self.books_view()
-    #     elif self.type_table == 1:
-    #         self.add_give = Give_book(0, self)
-    #         self.add_give.show()
-    #     elif self.type_table == 2:
-    #         self.add_auth = New_auth(self, 0, 0, 1)
-    #         self.add_auth.show()
-    #     elif self.type_table == 3:
-    #         self.add_client = Clients(self, 0, 0, 1)
-    #         self.add_client.show()
-
     def add_book(self):
         self.book_add.show()
 
@@ -260,106 +247,30 @@ class Manager(QMainWindow):
         self.book_edit = Edit_book(self, id_book)
         self.book_edit.show()
 
-    # def edit(self):
-    #     if self.type_table == 0:
-    #         id_book = self.check()
-    #         if id_book:
-    #             self.edit_book = Add_book(1, self, str(id_book))
-    #             self.edit_book.show()
-    #     elif self.type_table == 1:
-    #         id_journal = self.check()
-    #         if id_journal:
-    #             self.add_give = Give_book(1, self, id_journal)
-    #             self.add_give.show()
-    #     elif self.type_table == 2:
-    #         id_auth = self.check()
-    #         if id_auth:
-    #             self.add_auth = New_auth(self, self.check(), 1)
-    #             self.add_auth.show()
-    #     elif self.type_table == 3:
-    #         id_client = self.check()
-    #         if id_client:
-    #             self.edit_client = Clients(self, self.check(), 1)
-    #             self.edit_client.show()
+    def delete_book(self):
+        index_rows = list(set(i.row() for i in self.tw_books.selectedItems()))
+        if index_rows:
+            choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить книгу?',
+                                          QMessageBox.Yes | QMessageBox.No)
+            if choice == QMessageBox.Yes:
+                for elem in index_rows:
+                    ids = self.tw_books.item(elem, 0).text()
+                    cursor = self.connection.cursor()
+                    m = f'DELETE FROM books_in_library WHERE id_book = {str(ids)}'
+                    cursor.execute(m)
+                    self.connection.commit()
 
-    def delete(self):
-        if self.type_table == 0:
-            index_rows = list(set(i.row() for i in self.tw_books.selectedItems()))
-            if index_rows:
-                choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить книгу?',
-                                              QMessageBox.Yes | QMessageBox.No)
-                if choice == QMessageBox.Yes:
-                    for elem in index_rows:
-                        ids = self.tw_books.item(elem, 0).text()
-                        cursor = self.connection.cursor()
-                        m = f'DELETE FROM books WHERE id_book = {str(ids)}'
-                        cursor.execute(m)
-                        self.connection.commit()
-                        self.books_view()
-                elif choice == QMessageBox.No:
-                    pass
-        elif self.type_table == 1:
-            index_rows = list(set(i.row() for i in self.tw_books.selectedItems()))
-            if index_rows:
-                choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить запись??',
-                                              QMessageBox.Yes | QMessageBox.No)
-                if choice == QMessageBox.Yes:
-                    for elem in index_rows:
-                        idk = self.tw_books.item(elem, 4).text()
-                        idb = self.tw_books.item(elem, 5).text()
-                        cursor = self.connection.cursor()
-                        give = f'UPDATE books ' + \
-                               f'SET count_books = count_books + {int(idk)} ' + \
-                               f'WHERE id_book = {idb}'
-                        cursor.execute(give)
-                        self.connection.commit()
+                    n = f'DELETE FROM author_book WHERE id_book = {str(ids)}'
+                    cursor.execute(n)
+                    self.connection.commit()
 
-                        ids = self.tw_books.item(elem, 0).text()
-                        cursor = self.connection.cursor()
-                        m = f'DELETE FROM clients_books WHERE id_clients_books = {str(ids)}'
-                        cursor.execute(m)
-                        self.connection.commit()
-                    self.journal()
-                elif choice == QMessageBox.No:
-                    pass
-        elif self.type_table == 2:
-            index_rows = list([i.row() for i in self.tw_books.selectedItems()])
-            if index_rows:
-                choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить автора?',
-                                              QMessageBox.Yes | QMessageBox.No)
-                if choice == QMessageBox.Yes:
-                    for elem in index_rows:
-                        ids = self.tw_books.item(elem, 0).text()
-                        cursor = self.connection.cursor()
-                        m = f'DELETE FROM authors WHERE id_author = {str(ids)}'
-                        cursor.execute(m)
-                        self.connection.commit()
-                        cursor = self.connection.cursor()
-                        n = f'DELETE FROM authors_books WHERE id_author = {str(ids)}'
-                        cursor.execute(n)
-                        self.connection.commit()
-                    self.author_view()
-                elif choice == QMessageBox.No:
-                    pass
-        elif self.type_table == 3:
-            index_rows = list([i.row() for i in self.tw_books.selectedItems()])
-            if index_rows:
-                choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить клиента?',
-                                              QMessageBox.Yes | QMessageBox.No)
-                if choice == QMessageBox.Yes:
-                    for elem in index_rows:
-                        ids = self.tw_books.item(elem, 0).text()
-                        cursor = self.connection.cursor()
-                        m = f'DELETE FROM clients WHERE id_client = {str(ids)}'
-                        cursor.execute(m)
-                        self.connection.commit()
-                        cursor = self.connection.cursor()
-                        n = f'DELETE FROM clients_books WHERE id_client = {str(ids)}'
-                        cursor.execute(n)
-                        self.connection.commit()
-                    self.client_view()
-                elif choice == QMessageBox.No:
-                    pass
+                    c = f'DELETE FROM genre_book WHERE id_book = {str(ids)}'
+                    cursor.execute(c)
+                    self.connection.commit()
+
+                    self.books_view()
+            elif choice == QMessageBox.No:
+                pass
 
     def check(self):
         # Получение номера строки
