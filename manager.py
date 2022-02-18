@@ -53,7 +53,6 @@ class Manager(QMainWindow):
             f"FROM books_in_library "
             f"WHERE name_book "
             f"LIKE '%{search}%'").fetchall()
-        print(books)
         self.tw_books.setColumnCount(9)
         # скрытие столбца с ID книг
         self.tw_books.setColumnHidden(0, True)
@@ -204,7 +203,6 @@ class Manager(QMainWindow):
                               f"WHERE name_reader "
                               f"LIKE '%{search}%'"
                               ).fetchall()
-        print(auth)
         self.tw_readers.setColumnCount(5)
         self.tw_readers.setColumnHidden(0, True)
         self.tw_readers.setHorizontalHeaderLabels(
