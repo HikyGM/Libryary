@@ -1,6 +1,7 @@
 import sys
 import sqlite3
-# from add_book import Add_book
+from add_book import Add_book
+from edit_book import Edit_book
 # from new_auth import New_auth
 # from client_add import Clients
 # from give_book import Give_book
@@ -17,6 +18,8 @@ class Manager(QMainWindow):
         self.id_books = []
         self.type_table = 0
 
+        self.book_add = Add_book(self)
+
         self.books_view()
         self.client_view()
         self.journal()
@@ -25,6 +28,7 @@ class Manager(QMainWindow):
         self.btn_add_reader.clicked.connect(self.add_reader)
         self.btn_add_journal.clicked.connect(self.add_journal)
 
+        self.btn_edit_book.clicked.connect(self.edit_book)
 
         # self.btn_del.clicked.connect(self.delete)
 
@@ -44,7 +48,7 @@ class Manager(QMainWindow):
             self.client_view(self.input_search.text())
 
     def books_view(self, search=''):
-        # self.tab_clear()
+        self.tab_clear()
         if not search:
             search = ''
         cursor = self.connection.cursor()
@@ -227,23 +231,23 @@ class Manager(QMainWindow):
                 else:
                     self.tw_readers.setItem(i, j, QTableWidgetItem(str(val)))
 
-    def add(self):
-        if self.type_table == 0:
-            self.add_book = Add_book(0, self, 0)
-            self.add_book.show()
-            self.books_view()
-        elif self.type_table == 1:
-            self.add_give = Give_book(0, self)
-            self.add_give.show()
-        elif self.type_table == 2:
-            self.add_auth = New_auth(self, 0, 0, 1)
-            self.add_auth.show()
-        elif self.type_table == 3:
-            self.add_client = Clients(self, 0, 0, 1)
-            self.add_client.show()
+    # def add(self):
+    #     if self.type_table == 0:
+    #         self.add_book = Add_book(0, self, 0)
+    #         self.add_book.show()
+    #         self.books_view()
+    #     elif self.type_table == 1:
+    #         self.add_give = Give_book(0, self)
+    #         self.add_give.show()
+    #     elif self.type_table == 2:
+    #         self.add_auth = New_auth(self, 0, 0, 1)
+    #         self.add_auth.show()
+    #     elif self.type_table == 3:
+    #         self.add_client = Clients(self, 0, 0, 1)
+    #         self.add_client.show()
 
     def add_book(self):
-        pass
+        self.book_add.show()
 
     def add_reader(self):
         pass
@@ -251,27 +255,32 @@ class Manager(QMainWindow):
     def add_journal(self):
         pass
 
-    def edit(self):
-        if self.type_table == 0:
-            id_book = self.check()
-            if id_book:
-                self.edit_book = Add_book(1, self, str(id_book))
-                self.edit_book.show()
-        elif self.type_table == 1:
-            id_journal = self.check()
-            if id_journal:
-                self.add_give = Give_book(1, self, id_journal)
-                self.add_give.show()
-        elif self.type_table == 2:
-            id_auth = self.check()
-            if id_auth:
-                self.add_auth = New_auth(self, self.check(), 1)
-                self.add_auth.show()
-        elif self.type_table == 3:
-            id_client = self.check()
-            if id_client:
-                self.edit_client = Clients(self, self.check(), 1)
-                self.edit_client.show()
+    def edit_book(self):
+        id_book = self.check()
+        self.book_edit = Edit_book(self, id_book)
+        self.book_edit.show()
+
+    # def edit(self):
+    #     if self.type_table == 0:
+    #         id_book = self.check()
+    #         if id_book:
+    #             self.edit_book = Add_book(1, self, str(id_book))
+    #             self.edit_book.show()
+    #     elif self.type_table == 1:
+    #         id_journal = self.check()
+    #         if id_journal:
+    #             self.add_give = Give_book(1, self, id_journal)
+    #             self.add_give.show()
+    #     elif self.type_table == 2:
+    #         id_auth = self.check()
+    #         if id_auth:
+    #             self.add_auth = New_auth(self, self.check(), 1)
+    #             self.add_auth.show()
+    #     elif self.type_table == 3:
+    #         id_client = self.check()
+    #         if id_client:
+    #             self.edit_client = Clients(self, self.check(), 1)
+    #             self.edit_client.show()
 
     def delete(self):
         if self.type_table == 0:

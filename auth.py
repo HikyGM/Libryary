@@ -30,8 +30,9 @@ class Login(QMainWindow):
                       f'VALUES ("{check[2]}", "{"{}.{}.{}  {}:{}".format(now.day, now.month, now.year, now.hour, now.minute)}")'
                 cursor.execute(add)
                 self.connection.commit()
+                print(type(check[1]))
                 ex.hide()
-                if check[1] == 1:
+                if check[1] == '1':
                     self.admin.show()
                 elif check[1] == 2:
                     self.manager.show()

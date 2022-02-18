@@ -96,7 +96,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="line_name_2">
+   <widget class="QLineEdit" name="line_inv_numb">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -250,7 +250,7 @@
      <string>Удалить</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_add_tab_auth_2">
+   <widget class="QPushButton" name="btn_add_tab_genre">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -263,7 +263,7 @@
      <string>Добавить</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="line_name_3">
+   <widget class="QLineEdit" name="line_way">
     <property name="geometry">
      <rect>
       <x>260</x>
@@ -301,7 +301,10 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QLineEdit" name="line_name_4">
+   <widget class="QLineEdit" name="line_pub_houses">
+    <property name="enabled">
+     <bool>false</bool>
+    </property>
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -316,7 +319,7 @@
      </font>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_add_tab_auth_3">
+   <widget class="QPushButton" name="btn_add_tab_public_house">
     <property name="geometry">
      <rect>
       <x>390</x>
@@ -423,7 +426,7 @@ p, li { white-space: pre-wrap; }
      <string>Отмена</string>
     </property>
    </widget>
-   <widget class="QLabel" name="lab_info">
+   <widget class="QLabel" name="label_info">
     <property name="geometry">
      <rect>
       <x>10</x>
