@@ -48,8 +48,8 @@ class Add_public_house(QMainWindow):
 
     def add_public_house(self):
         id_genre = self.check(self.tw_public_house)
-        self.ex.name_public_house = id_genre
-        self.ex.view_public_house()
+        self.ex.name_group = id_genre
+        self.ex.view_group()
         self.close()
 
     def add_new_public_house(self):

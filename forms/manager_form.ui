@@ -23,7 +23,7 @@
          <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab_1">
          <attribute name="title">
@@ -157,7 +157,7 @@
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
-                 <widget class="QPushButton" name="view_reader">
+                 <widget class="QPushButton" name="btn_view_reader">
                   <property name="text">
                    <string>Просмотр карточки</string>
                   </property>

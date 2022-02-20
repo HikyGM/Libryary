@@ -3,7 +3,7 @@ from add_author import Add_author
 from add_genre import Add_genre
 from add_public_house import Add_public_house
 from PyQt5 import uic, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem
+from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
 
 
 class Edit_book(QMainWindow):
@@ -195,48 +195,6 @@ class Edit_book(QMainWindow):
         idge = list(set([self.table_genre.item(i, 0).text() for i in range(self.table_genre.rowCount())]))
         for num in range(len(idge)):
             cursor.execute(f'INSERT INTO genre_book(id_book, id_genre) VALUES ({self.id_book}, {idge[num]})')
-            self.connection.commit()
-
-        # очистка всех полей после добавления
-        self.list_authors = []
-        self.list_genre = []
-        self.name_public_house = ''
-        self.tab_clear(self.table_authors)
-        self.tab_clear(self.table_genre)
-        self.line_pub_houses.setText(str(self.name_public_house))
-        self.ex.books_view()
-        self.line_name.clear()
-        self.line_year.clear()
-        self.line_inv_numb.clear()
-        self.line_way.clear()
-        self.line_pub_houses.clear()
-        self.text_comm.clear()
-        # закрытие формы
-        self.close()
-
-    def add(self):
-        # добавление в базу книги
-        cursor = self.connection.cursor()
-        add = f'INSERT INTO books_in_library(name_book, year_book, id_pub_house, location_book, inventory_number, comm_book)' + \
-              f'VALUES ("{self.line_name.text()}", "{self.line_year.text()}", ' + \
-              f'"{self.name_public_house[0]}", "{self.line_way.text()}", "{self.line_inv_numb.text()}", ' \
-              f'"{self.text_comm.toPlainText()}")'
-        cursor.execute(add)
-        self.connection.commit()
-
-        # добавление в базу авторов книги
-        cursor = self.connection.cursor()
-        ids = cursor.execute(f'SELECT id_book FROM books_in_library ORDER BY id_book DESC LIMIT 1').fetchone()
-        id_authors = list(set([self.table_authors.item(i, 0).text() for i in range(self.table_authors.rowCount())]))
-        for num in range(len(id_authors)):
-            cursor.execute(f'INSERT INTO author_book(id_author, id_book) VALUES ({id_authors[num]}, {ids[0]})')
-            self.connection.commit()
-
-        # добавление в базу жанров книги
-        cursor = self.connection.cursor()
-        id_genres = list(set([self.table_genre.item(i, 0).text() for i in range(self.table_genre.rowCount())]))
-        for num in range(len(id_genres)):
-            cursor.execute(f'INSERT INTO genre_book(id_genre, id_book) VALUES ({id_genres[num]}, {ids[0]})')
             self.connection.commit()
 
         # очистка всех полей после добавления

@@ -2,9 +2,9 @@ import sys
 import sqlite3
 from add_book import Add_book
 from edit_book import Edit_book
-# from new_auth import New_auth
-# from client_add import Clients
-# from give_book import Give_book
+from add_reader import Add_reader
+from edit_reader import Edit_reader
+from view_reader import View_reader
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
 
@@ -19,16 +19,20 @@ class Manager(QMainWindow):
         self.type_table = 0
 
         self.book_add = Add_book(self)
+        self.reader_add = Add_reader(self)
 
         self.books_view()
         self.client_view()
         self.journal()
+
+        self.btn_view_reader.clicked.connect(self.view_reader)
 
         self.btn_add_book.clicked.connect(self.add_book)
         self.btn_add_reader.clicked.connect(self.add_reader)
         self.btn_add_journal.clicked.connect(self.add_journal)
 
         self.btn_edit_book.clicked.connect(self.edit_book)
+        self.btn_edit_reader.clicked.connect(self.edit_reader)
 
         self.btn_del_book.clicked.connect(self.delete_book)
 
@@ -237,15 +241,25 @@ class Manager(QMainWindow):
         self.book_add.show()
 
     def add_reader(self):
-        pass
+        self.reader_add.show()
 
     def add_journal(self):
         pass
 
     def edit_book(self):
-        id_book = self.check()
+        id_book = self.check(self.tw_books)
         self.book_edit = Edit_book(self, id_book)
         self.book_edit.show()
+
+    def edit_reader(self):
+        id_reader = self.check(self.tw_readers)
+        self.reader_edit = Edit_reader(self, id_reader)
+        self.reader_edit.show()
+
+    def view_reader(self):
+        id_reader = self.check(self.tw_readers)
+        self.reader_view = View_reader(self, id_reader)
+        self.reader_view.show()
 
     def delete_book(self):
         index_rows = list(set(i.row() for i in self.tw_books.selectedItems()))
@@ -272,12 +286,12 @@ class Manager(QMainWindow):
             elif choice == QMessageBox.No:
                 pass
 
-    def check(self):
+    def check(self, table):
         # Получение номера строки
-        rows = list(set([i.row() for i in self.tw_books.selectedItems()]))
+        rows = list(set([i.row() for i in table.selectedItems()]))
         if rows:
             # Получение ID в строке (0-ой столбец)
-            ids = self.tw_books.item(rows[0], 0).text()
+            ids = table.item(rows[0], 0).text()
             return ids
         else:
             return False

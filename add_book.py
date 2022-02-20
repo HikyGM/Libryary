@@ -74,12 +74,21 @@ class Add_book(QMainWindow):
         self.line_pub_houses.setText(str(self.name_public_house[1]))
 
     def cancel(self):
+        # очистка всех полей после добавления
         self.list_authors = []
         self.list_genre = []
         self.name_public_house = ''
         self.tab_clear(self.table_authors)
         self.tab_clear(self.table_genre)
+        self.line_pub_houses.setText(str(self.name_public_house))
+        self.ex.books_view()
+        self.line_name.clear()
+        self.line_year.clear()
+        self.line_inv_numb.clear()
+        self.line_way.clear()
         self.line_pub_houses.clear()
+        self.text_comm.clear()
+        # закрытие формы
         self.close()
 
     def tab_clear(self, table):
@@ -101,7 +110,7 @@ class Add_book(QMainWindow):
         elif not self.table_authors.rowCount():
             self.label_info.setText('Добавьте автора книги')
         elif not self.table_genre.rowCount():
-            self.label_info.setText('Добавьте автора книги')
+            self.label_info.setText('Добавьте жанр книги')
         else:
             self.add()
 

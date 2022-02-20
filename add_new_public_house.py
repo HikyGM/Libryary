@@ -24,5 +24,5 @@ class Add_new_public_house(QMainWindow):
               f'VALUES ("{self.line_name.text()}")'
         cursor.execute(add)
         self.connection.commit()
-        self.ex.public_house_view()
+        self.ex.groups_view()
         self.close()
