@@ -330,7 +330,7 @@
      <enum>Qt::Horizontal</enum>
     </property>
    </widget>
-   <widget class="QTableWidget" name="tableWidget">
+   <widget class="QTableWidget" name="tw_view_books">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -364,7 +364,6 @@
     </property>
    </widget>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
  <connections/>

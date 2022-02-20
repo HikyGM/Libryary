@@ -5,18 +5,20 @@ from edit_book import Edit_book
 from add_reader import Add_reader
 from edit_reader import Edit_reader
 from view_reader import View_reader
+from add_give_books import Add_give_books
 from PyQt5 import uic, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
 
 
 class Manager(QMainWindow):
-    def __init__(self):
+    def __init__(self, id_user):
         super().__init__()
         self.connection = sqlite3.connect("db/library.db")
         uic.loadUi('forms/manager_form.ui', self)  # Загружаем дизайн
 
         self.id_books = []
         self.type_table = 0
+        self.id_user = id_user
 
         self.book_add = Add_book(self)
         self.reader_add = Add_reader(self)
@@ -35,6 +37,8 @@ class Manager(QMainWindow):
         self.btn_edit_reader.clicked.connect(self.edit_reader)
 
         self.btn_del_book.clicked.connect(self.delete_book)
+        self.btn_del_reader.clicked.connect(self.delete_reader)
+        self.btn_del_journal.clicked.connect(self.delete_journal)
 
         # self.btn_del.clicked.connect(self.delete)
 
@@ -54,7 +58,7 @@ class Manager(QMainWindow):
             self.client_view(self.input_search.text())
 
     def books_view(self, search=''):
-        self.tab_clear()
+        self.tab_clear(self.tw_books)
         if not search:
             search = ''
         cursor = self.connection.cursor()
@@ -117,23 +121,11 @@ class Manager(QMainWindow):
                 else:
                     self.tw_books.setItem(i, j, QTableWidgetItem(str(val)))
 
-    def tab_clear(self):
-        # Удаление содержимого таблицы
-        self.tw_books.clear()
-        # Удаление сетки таблицы
-        self.tw_books.setRowCount(0)
-        self.tw_books.setColumnCount(0)
-
     def journal(self, search=''):
-        self.type_table = 1
-        # self.tab_clear()
+        self.tab_clear(self.tw_journal)
         if not search:
             search = ''
         cursor = self.connection.cursor()
-        # ticket = f"SELECT cb.id_clients_books, cb.id_client, cb.id_book, cb.date, cb.count_book, cb.id_book " + \
-        #      f"FROM clients_books cb, clients c " + \
-        #      f"WHERE cb.id_client = c.id_client AND c.name_client " + \
-        #      f"LIKE '%{search}%'"
         ticket = f"SELECT rt.id_reader_ticket, rt.id_reader, rt.id_book, rt.id_user, rt.date_give, rt.date_return, rt.return_check " + \
                  f"FROM readers_ticket rt, readers r " + \
                  f"WHERE rt.id_reader = r.id_reader AND r.name_reader " + \
@@ -176,35 +168,8 @@ class Manager(QMainWindow):
                 else:
                     self.tw_journal.setItem(i, j, QTableWidgetItem(str(val)))
 
-    def author_view(self, search=''):
-        self.type_table = 2
-        # self.tab_clear()
-        if not search:
-            search = ''
-        cursor = self.connection.cursor()
-        auth = cursor.execute(f"SELECT id_author, name_author "
-                              f"FROM authors "
-                              f"WHERE name_author "
-                              f"LIKE '%{search}%'").fetchall()
-        self.tw_books.setColumnCount(2)
-        self.tw_books.setColumnHidden(0, True)
-        self.tw_books.setHorizontalHeaderLabels(
-            ['ID', 'Авторы'])
-        self.tw_books.setRowCount(len(auth))
-        self.tw_books.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        self.tw_books.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        row_num = self.tw_books.currentRow()
-        self.tw_books.selectRow(row_num)
-        self.tw_books.verticalHeader().setVisible(False)
-        self.tw_books.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        self.tw_books.verticalHeader().setDefaultSectionSize(70)
-        for i, elem in enumerate(auth):
-            for j, val in enumerate(elem):
-                self.tw_books.setItem(i, j, QTableWidgetItem(str(val)))
-
     def client_view(self, search=''):
-        self.type_table = 3
-        # self.tab_clear()
+        self.tab_clear(self.tw_readers)
         if not search:
             search = ''
         cursor = self.connection.cursor()
@@ -237,6 +202,11 @@ class Manager(QMainWindow):
                 else:
                     self.tw_readers.setItem(i, j, QTableWidgetItem(str(val)))
 
+    def view_reader(self):
+        id_reader = self.check(self.tw_readers)
+        self.reader_view = View_reader(self, id_reader)
+        self.reader_view.show()
+
     def add_book(self):
         self.book_add.show()
 
@@ -244,7 +214,8 @@ class Manager(QMainWindow):
         self.reader_add.show()
 
     def add_journal(self):
-        pass
+        self.give_books_add = Add_give_books(self, self.id_user)
+        self.give_books_add.show()
 
     def edit_book(self):
         id_book = self.check(self.tw_books)
@@ -256,10 +227,10 @@ class Manager(QMainWindow):
         self.reader_edit = Edit_reader(self, id_reader)
         self.reader_edit.show()
 
-    def view_reader(self):
-        id_reader = self.check(self.tw_readers)
-        self.reader_view = View_reader(self, id_reader)
-        self.reader_view.show()
+    def edit_journal(self):
+        pass
+
+
 
     def delete_book(self):
         index_rows = list(set(i.row() for i in self.tw_books.selectedItems()))
@@ -286,6 +257,45 @@ class Manager(QMainWindow):
             elif choice == QMessageBox.No:
                 pass
 
+    def delete_reader(self):
+        index_rows = list(set(i.row() for i in self.tw_readers.selectedItems()))
+        if index_rows:
+            choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить читателя?',
+                                          QMessageBox.Yes | QMessageBox.No)
+            if choice == QMessageBox.Yes:
+                for elem in index_rows:
+                    ids = self.tw_readers.item(elem, 0).text()
+                    cursor = self.connection.cursor()
+                    m = f'DELETE FROM readers WHERE id_reader = {str(ids)}'
+                    cursor.execute(m)
+                    self.connection.commit()
+
+                    n = f'DELETE FROM readers_ticket WHERE id_reader = {str(ids)}'
+                    cursor.execute(n)
+                    self.connection.commit()
+
+                    self.client_view()
+                    self.journal()
+            elif choice == QMessageBox.No:
+                pass
+
+    def delete_journal(self):
+        index_rows = list(set(i.row() for i in self.tw_journal.selectedItems()))
+        if index_rows:
+            choice = QMessageBox.question(self, '', 'Вы действительно хотите удалить запись?',
+                                          QMessageBox.Yes | QMessageBox.No)
+            if choice == QMessageBox.Yes:
+                for elem in index_rows:
+                    ids = self.tw_journal.item(elem, 0).text()
+                    cursor = self.connection.cursor()
+                    m = f'DELETE FROM readers_ticket WHERE id_reader_ticket = {str(ids)}'
+                    cursor.execute(m)
+                    self.connection.commit()
+
+                    self.journal()
+            elif choice == QMessageBox.No:
+                pass
+
     def check(self, table):
         # Получение номера строки
         rows = list(set([i.row() for i in table.selectedItems()]))
@@ -295,6 +305,13 @@ class Manager(QMainWindow):
             return ids
         else:
             return False
+
+    def tab_clear(self, table):
+        # Удаление содержимого таблицы
+        table.clear()
+        # Удаление сетки таблицы
+        table.setRowCount(0)
+        table.setColumnCount(0)
 
 
 def except_hook(cls, exception, traceback):

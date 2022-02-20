@@ -11,13 +11,13 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Добавление книги</string>
+   <string>Выдача книг</string>
   </property>
   <property name="documentMode">
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="QTableWidget" name="table_authors">
+   <widget class="QTableWidget" name="table_books">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -43,7 +43,7 @@
      <rect>
       <x>10</x>
       <y>80</y>
-      <width>491</width>
+      <width>411</width>
       <height>21</height>
      </rect>
     </property>
@@ -61,7 +61,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_add_tab_auth">
+   <widget class="QPushButton" name="btn_add_tab_books">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -74,7 +74,7 @@
      <string>Добавить</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_del_auth_tab">
+   <widget class="QPushButton" name="btn_del_books_tab">
     <property name="geometry">
      <rect>
       <x>430</x>
@@ -87,7 +87,7 @@
      <string>Удалить</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="line_pub_houses">
+   <widget class="QLineEdit" name="line_reader">
     <property name="enabled">
      <bool>false</bool>
     </property>
@@ -105,7 +105,7 @@
      </font>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_add_tab_public_house">
+   <widget class="QPushButton" name="btn_add_reader">
     <property name="geometry">
      <rect>
       <x>430</x>

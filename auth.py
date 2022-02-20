@@ -12,7 +12,7 @@ class Login(QMainWindow):
     def __init__(self):
         super().__init__()
         self.librarian = Librarian()
-        self.manager = Manager()
+
         self.admin = Admin()
         self.connection = sqlite3.connect("db/library.db")
         uic.loadUi('forms/auth_form.ui', self)  # Загружаем дизайн
@@ -27,13 +27,14 @@ class Login(QMainWindow):
                 cursor = self.connection.cursor()
                 now = datetime.now()
                 add = f'INSERT INTO journal(id_user, data_time)' + \
-                      f'VALUES ("{check[2]}", "{"{}.{}.{}  {}:{}".format(now.day, now.month, now.year, now.hour, now.minute)}")'
+                      f'VALUES ("{check[2]}", "{datetime.now().strftime("%d.%m.%Y %H:%M:%S")}")'
                 cursor.execute(add)
                 self.connection.commit()
                 ex.hide()
                 if check[1] == '1':
                     self.admin.show()
                 elif check[1] == 2:
+                    self.manager = Manager(check[2])
                     self.manager.show()
                 elif check[1] == 3:
                     self.librarian.show()

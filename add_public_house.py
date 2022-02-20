@@ -47,9 +47,9 @@ class Add_public_house(QMainWindow):
                 self.tw_public_house.setItem(i, j, QTableWidgetItem(str(val)))
 
     def add_public_house(self):
-        id_genre = self.check(self.tw_public_house)
-        self.ex.name_group = id_genre
-        self.ex.view_group()
+        id_public_house = self.check(self.tw_public_house)
+        self.ex.name_public_house = id_public_house
+        self.ex.view_public_house()
         self.close()
 
     def add_new_public_house(self):
