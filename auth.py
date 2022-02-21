@@ -11,7 +11,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow
 class Login(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.librarian = Librarian()
+
 
         self.admin = Admin()
         self.connection = sqlite3.connect("db/library.db")
@@ -36,7 +36,8 @@ class Login(QMainWindow):
                 elif check[1] == 2:
                     self.manager = Manager(check[2])
                     self.manager.show()
-                elif check[1] == 3:
+                elif check[1] == '3':
+                    self.librarian = Librarian(check[2])
                     self.librarian.show()
             else:
                 self.error_label.setText('Неверный логин или пароль')

@@ -121,7 +121,7 @@ class Admin(QMainWindow):
         cursor = self.connection.cursor()
         users = cursor.execute(
             f"SELECT id_journal, id_user, data_time "
-            f"FROM journal ").fetchall()
+            f"FROM journal ORDER BY id_journal DESC").fetchall()
         self.tw_auth_journal.setColumnCount(3)
         # скрытие столбца с ID книг
         # self.tw_users.setColumnHidden(0, True)
