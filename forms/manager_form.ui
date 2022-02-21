@@ -23,7 +23,7 @@
          <string notr="true">font: 12pt &quot;MS Shell Dlg 2&quot;;</string>
         </property>
         <property name="currentIndex">
-         <number>1</number>
+         <number>2</number>
         </property>
         <widget class="QWidget" name="tab_1">
          <attribute name="title">
@@ -37,14 +37,14 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_4">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit"/>
+                 <widget class="QLineEdit" name="line_search_books"/>
                 </item>
                </layout>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_14">
                 <item>
-                 <widget class="QPushButton" name="pushButton_5">
+                 <widget class="QPushButton" name="btn_search_books">
                   <property name="text">
                    <string>Поиск</string>
                   </property>
@@ -121,14 +121,14 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_6">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_2"/>
+                 <widget class="QLineEdit" name="line_search_readers"/>
                 </item>
                </layout>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_16">
                 <item>
-                 <widget class="QPushButton" name="pushButton_6">
+                 <widget class="QPushButton" name="btn_search_readers">
                   <property name="text">
                    <string>Поиск</string>
                   </property>
@@ -216,14 +216,14 @@
               <item>
                <layout class="QVBoxLayout" name="verticalLayout_9">
                 <item>
-                 <widget class="QLineEdit" name="lineEdit_3"/>
+                 <widget class="QLineEdit" name="line_search_journal"/>
                 </item>
                </layout>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_24">
                 <item>
-                 <widget class="QPushButton" name="pushButton_7">
+                 <widget class="QPushButton" name="btn_search_journal">
                   <property name="text">
                    <string>Поиск</string>
                   </property>
@@ -261,15 +261,7 @@
                </layout>
               </item>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_29">
-                <item>
-                 <widget class="QPushButton" name="btn_edit_journal">
-                  <property name="text">
-                   <string>Изменить</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
+               <layout class="QHBoxLayout" name="horizontalLayout_29"/>
               </item>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_30">

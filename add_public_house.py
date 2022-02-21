@@ -28,7 +28,7 @@ class Add_public_house(QMainWindow):
                                       f"LIKE '%{search}%'"
                                       ).fetchall()
         self.tw_public_house.setColumnCount(2)
-        # self.tw_public_house.setColumnHidden(0, True)
+        self.tw_public_house.setColumnHidden(0, True)
         self.tw_public_house.setHorizontalHeaderLabels(
             ['ID', 'Наименование'])
         self.tw_public_house.setRowCount(len(public_house))

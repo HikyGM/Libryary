@@ -28,7 +28,7 @@ class Add_genre(QMainWindow):
                                 f"LIKE '%{search}%'"
                                 ).fetchall()
         self.tw_genre.setColumnCount(2)
-        # self.tw_genre.setColumnHidden(0, True)
+        self.tw_genre.setColumnHidden(0, True)
         self.tw_genre.setHorizontalHeaderLabels(
             ['ID', 'Наименование'])
         self.tw_genre.setRowCount(len(genres))

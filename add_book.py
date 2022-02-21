@@ -25,14 +25,18 @@ class Add_book(QMainWindow):
 
         # события кнопок
         self.btn_add.clicked.connect(self.check_lines)
+        self.btn_cancel.clicked.connect(self.cancel)
+
         self.btn_add_tab_auth.clicked.connect(self.add_authors)
         self.btn_add_tab_genre.clicked.connect(self.add_genre)
         self.btn_add_tab_public_house.clicked.connect(self.add_public_house)
-        self.btn_cancel.clicked.connect(self.cancel)
+
+        self.btn_del_auth_tab.clicked.connect(self.delete_author)
+        self.btn_del_genre_tab.clicked.connect(self.delete_genre)
 
     def view_author(self):
         self.table_authors.setColumnCount(2)
-        # self.tw_authors.setColumnHidden(0, True)
+        self.table_authors.setColumnHidden(0, True)
         self.table_authors.setHorizontalHeaderLabels(
             ['ID', 'Автор'])
         self.table_authors.setRowCount(len(self.list_authors))
@@ -52,7 +56,7 @@ class Add_book(QMainWindow):
 
     def view_genre(self):
         self.table_genre.setColumnCount(2)
-        # self.tw_authors.setColumnHidden(0, True)
+        self.table_genre.setColumnHidden(0, True)
         self.table_genre.setHorizontalHeaderLabels(
             ['ID', 'Автор'])
         self.table_genre.setRowCount(len(self.list_genre))
@@ -164,3 +168,14 @@ class Add_book(QMainWindow):
         self.text_comm.clear()
         # закрытие формы
         self.close()
+
+    def delete_author(self):
+        index_rows_author = list([i.row() for i in self.table_authors.selectedItems()])
+        del self.list_authors[index_rows_author[0]]
+        self.view_author()
+
+    def delete_genre(self):
+        index_rows_genre = list([i.row() for i in self.table_genre.selectedItems()])
+        del self.list_genre[index_rows_genre[0]]
+        self.view_genre()
+

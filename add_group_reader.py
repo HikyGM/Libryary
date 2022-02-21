@@ -29,7 +29,7 @@ class Add_group_reader(QMainWindow):
                                       f"LIKE '%{search}%'"
                                       ).fetchall()
         self.tw_groups.setColumnCount(2)
-        # self.tw_groups.setColumnHidden(0, True)
+        self.tw_groups.setColumnHidden(0, True)
         self.tw_groups.setHorizontalHeaderLabels(
             ['ID', 'Наименование'])
         self.tw_groups.setRowCount(len(public_house))

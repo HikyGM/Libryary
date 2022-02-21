@@ -16,7 +16,6 @@ class Manager(QMainWindow):
         self.connection = sqlite3.connect("db/library.db")
         uic.loadUi('forms/manager_form.ui', self)  # Загружаем дизайн
 
-        self.id_books = []
         self.type_table = 0
         self.id_user = id_user
 
@@ -29,6 +28,10 @@ class Manager(QMainWindow):
 
         self.btn_view_reader.clicked.connect(self.view_reader)
 
+        self.btn_search_books.clicked.connect(self.search_books)
+        self.btn_search_readers.clicked.connect(self.search_reader)
+        self.btn_search_journal.clicked.connect(self.search_journal)
+
         self.btn_add_book.clicked.connect(self.add_book)
         self.btn_add_reader.clicked.connect(self.add_reader)
         self.btn_add_journal.clicked.connect(self.add_journal)
@@ -40,27 +43,25 @@ class Manager(QMainWindow):
         self.btn_del_reader.clicked.connect(self.delete_reader)
         self.btn_del_journal.clicked.connect(self.delete_journal)
 
-        # self.btn_del.clicked.connect(self.delete)
+    def search_books(self):
+        self.books_view(self.line_search_books.text())
 
-        # self.tw_books.itemChanged.connect(self.edit)
-        # self.tw_books.itemChanged.connect(self.edit)
+    def search_reader(self):
+        self.client_view(self.line_search_readers.text())
 
-        # self.btn_search.clicked.connect(self.search)
-
-    def search(self):
-        if self.type_table == 0:
-            self.books_view(self.input_search.text())
-        elif self.type_table == 1:
-            self.journal(self.input_search.text())
-        elif self.type_table == 2:
-            self.author_view(self.input_search.text())
-        elif self.type_table == 3:
-            self.client_view(self.input_search.text())
+    def search_journal(self):
+        self.journal(self.line_search_journal.text())
 
     def books_view(self, search=''):
         self.tab_clear(self.tw_books)
         if not search:
             search = ''
+        cursor = self.connection.cursor()
+        res_give_book = cursor.execute(
+            f"SELECT id_book "
+            f"FROM readers_ticket "
+        ).fetchall()
+        id_give_book = [int(elem[0]) for elem in res_give_book]
         cursor = self.connection.cursor()
         books = cursor.execute(
             f"SELECT id_book, name_book, id_book, id_book, year_book, location_book, inventory_number, id_pub_house, comm_book "
@@ -68,58 +69,46 @@ class Manager(QMainWindow):
             f"WHERE name_book "
             f"LIKE '%{search}%'").fetchall()
         self.tw_books.setColumnCount(9)
-        # скрытие столбца с ID книг
         self.tw_books.setColumnHidden(0, True)
         self.tw_books.setHorizontalHeaderLabels(
             ['ID', 'Наименование', 'Авторы', 'Жанр', 'Год', 'Местоположение', 'Инвертарный номер', 'Издатель',
              'Комментарий'])
-        self.tw_books.setRowCount(len(books))
-        # запрет на редактирование содержимого таблицы
+        self.tw_books.setRowCount(len(books) - len(id_give_book))
         self.tw_books.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
-        # выделение всей строки при нажатии на айтем
         self.tw_books.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         row_num = self.tw_books.currentRow()
         self.tw_books.selectRow(row_num)
-        # убираем не нужные номера строк
         self.tw_books.verticalHeader().setVisible(False)
-        # установка адаптивно заполняющего размера ячеек
         self.tw_books.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        # установка размера ячеек по вертикали
         self.tw_books.verticalHeader().setDefaultSectionSize(50)
-        # self.tw_books.verticalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Stretch)
-        # установка размера ячеек по горизонтали
         self.tw_books.horizontalHeader().setDefaultSectionSize(150)
-        # фиксированный размер 3 столбца
-        # self.tw_books.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)
-
         self.tw_books.horizontalHeader().setDefaultSectionSize(100)
-        # фиксированный размер 3 столбца
-        # self.tw_books.horizontalHeader().setSectionResizeMode(4, QtWidgets.QHeaderView.Fixed)
-        # self.tw_books.horizontalHeader().setSectionResizeMode(5, QtWidgets.QHeaderView.Fixed)
-
+        count_rows = 0
         for i, elem in enumerate(books):
+            if elem[0] in id_give_book:
+                continue
             for j, val in enumerate(elem):
                 if j == 2:
-                    self.id_books.append(val)
                     authors = cursor.execute("""
                             SELECT a.name_author 
                             FROM author_book ab, authors a
                             WHERE ab.id_author = a.id_author and ab.id_book = ?""", (val,)).fetchall()
-                    self.tw_books.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in authors])))
+                    self.tw_books.setItem(count_rows, j, QTableWidgetItem(", ".join([b[0] for b in authors])))
                 elif j == 3:
                     genre = cursor.execute("""
                             SELECT a.name_genre
                             FROM genre_book ab, genre a
                             WHERE ab.id_genre = a.id_genre and ab.id_book = ?""", (val,)).fetchall()
-                    self.tw_books.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in genre])))
+                    self.tw_books.setItem(count_rows, j, QTableWidgetItem(", ".join([b[0] for b in genre])))
                 elif j == 7:
-                    genre = cursor.execute("""
+                    pub_house = cursor.execute("""
                             SELECT name_pub_house
                             FROM pub_houses
                             WHERE id_pub_house = ?""", (val,)).fetchall()
-                    self.tw_books.setItem(i, j, QTableWidgetItem(", ".join([i[0] for i in genre])))
+                    self.tw_books.setItem(count_rows, j, QTableWidgetItem(", ".join([b[0] for b in pub_house])))
                 else:
-                    self.tw_books.setItem(i, j, QTableWidgetItem(str(val)))
+                    self.tw_books.setItem(count_rows, j, QTableWidgetItem(str(val)))
+            count_rows += 1
 
     def journal(self, search=''):
         self.tab_clear(self.tw_journal)
@@ -147,7 +136,6 @@ class Manager(QMainWindow):
         for i, elem in enumerate(journal):
             for j, val in enumerate(elem):
                 if j == 1:
-                    self.id_books.append(val)
                     reader = cursor.execute("""
                             SELECT name_reader
                             FROM readers
@@ -193,7 +181,6 @@ class Manager(QMainWindow):
         for i, elem in enumerate(auth):
             for j, val in enumerate(elem):
                 if j == 2:
-                    self.id_books.append(val)
                     reader = cursor.execute("""
                             SELECT name_group 
                             FROM groups
@@ -229,8 +216,6 @@ class Manager(QMainWindow):
 
     def edit_journal(self):
         pass
-
-
 
     def delete_book(self):
         index_rows = list(set(i.row() for i in self.tw_books.selectedItems()))
@@ -293,6 +278,7 @@ class Manager(QMainWindow):
                     self.connection.commit()
 
                     self.journal()
+                    self.books_view()
             elif choice == QMessageBox.No:
                 pass
 

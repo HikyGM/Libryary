@@ -213,6 +213,11 @@
       <height>121</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <pointsize>12</pointsize>
+     </font>
+    </property>
    </widget>
    <widget class="QLabel" name="label_8">
     <property name="geometry">
@@ -237,7 +242,7 @@
      <set>Qt::AlignCenter</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_del_auth_tab_2">
+   <widget class="QPushButton" name="btn_del_genre_tab">
     <property name="geometry">
      <rect>
       <x>390</x>

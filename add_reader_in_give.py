@@ -27,7 +27,7 @@ class Add_reader_in_give(QMainWindow):
                                       f"LIKE '%{search}%'"
                                       ).fetchall()
         self.tw_readers.setColumnCount(3)
-        # self.tw_readers.setColumnHidden(0, True)
+        self.tw_readers.setColumnHidden(0, True)
         self.tw_readers.setHorizontalHeaderLabels(
             ['ID', 'ФИО', 'Группа'])
         self.tw_readers.setRowCount(len(public_house))

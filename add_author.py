@@ -28,7 +28,7 @@ class Add_author(QMainWindow):
                                  f"LIKE '%{search}%'"
                                  ).fetchall()
         self.tw_authors.setColumnCount(2)
-        # self.tw_authors.setColumnHidden(0, True)
+        self.tw_authors.setColumnHidden(0, True)
         self.tw_authors.setHorizontalHeaderLabels(
             ['ID', 'Автор'])
         self.tw_authors.setRowCount(len(authors))

@@ -22,8 +22,13 @@ class Add_give_book(QMainWindow):
         if not search:
             search = ''
         cursor = self.connection.cursor()
-
-        genres = cursor.execute(f"SELECT id_book, name_book, location_book, inventory_number "
+        res_give_book = cursor.execute(
+            f"SELECT id_book "
+            f"FROM readers_ticket "
+        ).fetchall()
+        id_give_book = [int(elem[0]) for elem in res_give_book]
+        cursor = self.connection.cursor()
+        books = cursor.execute(f"SELECT id_book, name_book, location_book, inventory_number "
                                 f"FROM books_in_library "
                                 f"WHERE name_book "
                                 f"LIKE '%{search}%'"
@@ -32,7 +37,7 @@ class Add_give_book(QMainWindow):
         # self.tw_authors.setColumnHidden(0, True)
         self.tw_books.setHorizontalHeaderLabels(
             ['ID', 'Название книги', 'Местоположение', 'N'])
-        self.tw_books.setRowCount(len(genres))
+        self.tw_books.setRowCount(len(books) - len(id_give_book))
         self.tw_books.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tw_books.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         row_num = self.tw_books.currentRow()
@@ -43,9 +48,13 @@ class Add_give_book(QMainWindow):
         self.tw_books.horizontalHeader().setDefaultSectionSize(150)
         self.tw_books.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.Fixed)
         self.tw_books.horizontalHeader().setDefaultSectionSize(20)
-        for i, elem in enumerate(genres):
+        count_rows = 0
+        for i, elem in enumerate(books):
+            if elem[0] in id_give_book:
+                continue
             for j, val in enumerate(elem):
-                self.tw_books.setItem(i, j, QTableWidgetItem(str(val)))
+                self.tw_books.setItem(count_rows, j, QTableWidgetItem(str(val)))
+            count_rows += 1
 
     def add_book(self):
         id_book = self.check(self.tw_books)

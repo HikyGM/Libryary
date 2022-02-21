@@ -81,6 +81,7 @@ class Add_give_books(QMainWindow):
         self.line_reader.clear()
 
         self.ex.journal()
+        self.ex.books_view()
         # закрытие формы
         self.close()
 

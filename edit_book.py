@@ -78,10 +78,12 @@ class Edit_book(QMainWindow):
         self.btn_add_tab_genre.clicked.connect(self.add_genre)
         self.btn_add_tab_public_house.clicked.connect(self.add_public_house)
         self.btn_cancel.clicked.connect(self.cancel)
+        self.btn_del_auth_tab.clicked.connect(self.delete_author)
+        self.btn_del_genre_tab.clicked.connect(self.delete_genre)
 
     def view_author(self):
         self.table_authors.setColumnCount(2)
-        # self.tw_authors.setColumnHidden(0, True)
+        self.table_authors.setColumnHidden(0, True)
         self.table_authors.setHorizontalHeaderLabels(
             ['ID', 'Автор'])
         self.table_authors.setRowCount(len(self.list_authors))
@@ -162,6 +164,16 @@ class Edit_book(QMainWindow):
 
     def add_public_house(self):
         self.public_house_view.show()
+
+    def delete_author(self):
+        index_rows_author = list([i.row() for i in self.table_authors.selectedItems()])
+        del self.list_authors[index_rows_author[0]]
+        self.view_author()
+
+    def delete_genre(self):
+        index_rows_genre = list([i.row() for i in self.table_genre.selectedItems()])
+        del self.list_genre[index_rows_genre[0]]
+        self.view_genre()
 
     def update(self):
         cursor = self.connection.cursor()
