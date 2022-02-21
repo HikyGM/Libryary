@@ -33,7 +33,7 @@ class Login(QMainWindow):
                 ex.hide()
                 if check[1] == '1':
                     self.admin.show()
-                elif check[1] == 2:
+                elif check[1] == '2':
                     self.manager = Manager(check[2])
                     self.manager.show()
                 elif check[1] == '3':

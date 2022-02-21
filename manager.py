@@ -7,7 +7,9 @@ from edit_reader import Edit_reader
 from view_reader import View_reader
 from add_give_books import Add_give_books
 from PyQt5 import uic, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTableWidgetItem, QMessageBox, QFileDialog
+from docxtpl import DocxTemplate
+import datetime as dt
 
 
 class Manager(QMainWindow):
@@ -43,6 +45,8 @@ class Manager(QMainWindow):
         self.btn_del_reader.clicked.connect(self.delete_reader)
         self.btn_del_journal.clicked.connect(self.delete_journal)
 
+        self.btn_generate_books.clicked.connect(self.generate_doc)
+
     def search_books(self):
         self.books_view(self.line_search_books.text())
 
@@ -73,6 +77,7 @@ class Manager(QMainWindow):
         self.tw_books.setHorizontalHeaderLabels(
             ['ID', 'Наименование', 'Авторы', 'Жанр', 'Год', 'Местоположение', 'Инвертарный номер', 'Издатель',
              'Комментарий'])
+        self.len_books, self.len_give_books = len(books), len(id_give_book)
         self.tw_books.setRowCount(len(books) - len(id_give_book))
         self.tw_books.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tw_books.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
@@ -281,6 +286,42 @@ class Manager(QMainWindow):
                     self.books_view()
             elif choice == QMessageBox.No:
                 pass
+
+    def generate_doc(self):
+        dirlist = QFileDialog.getExistingDirectory(self, "Выбрать папку", ".")
+        cursor = self.connection.cursor()
+
+        date_return = cursor.execute("""
+                                    SELECT date_return
+                                    FROM readers_ticket""").fetchall()
+        name_user = cursor.execute("""
+                            SELECT name_user
+                            FROM users
+                            WHERE id_user = ?""", (self.id_user,)).fetchall()
+        name = name_user[0][0]
+        print(name)
+        date_return_accept = cursor.execute("""
+                                    SELECT date_return
+                                    FROM readers_ticket
+                                    WHERE return_check = 'НЕТ'""").fetchall()
+        all_date = [date[0] for date in date_return_accept]
+        not_return_books = 0
+        for k in all_date:
+            a = k.split('.')
+            if dt.date(int(a[2]), int(a[1]), int(a[0])) < dt.date.today():
+                not_return_books += 1
+        doc = DocxTemplate(f"doc/books.docx")
+        context = {
+            'count_all_books': self.len_books,
+            'all_count_give_books': self.len_give_books,
+            'count_give_books': len(date_return_accept),
+            'count_not_return_books': not_return_books,
+            'count_return_books': len(date_return) - len(date_return_accept),
+            'name_user': name,
+            'date': dt.date.today()
+        }
+        doc.render(context)
+        doc.save(f"{dirlist}/books_{dt.date.today()}.docx")
 
     def check(self, table):
         # Получение номера строки
